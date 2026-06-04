@@ -393,6 +393,75 @@ button { font: inherit; cursor: pointer; }
 .acciones { display: flex; gap: 10px; margin-top: 4px; }
 .acciones .btn { flex: 1; }
 
+/* ---------- Marca + salir (cabecera) ---------- */
+.marca { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.salir {
+  align-self: flex-start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  color: var(--tenue);
+  font-size: 0.76rem;
+  padding: 0;
+  transition: color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .salir:hover { color: var(--peligro); }
+}
+
+/* ---------- Pantalla de acceso (login / registro) ---------- */
+.auth {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+}
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 28px 24px;
+  box-shadow: var(--sombra);
+  /* Entrada suave. */
+  opacity: 0;
+  transform: translateY(10px);
+  animation: aparecer 420ms var(--ease-out) forwards;
+}
+.auth-titulo {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+.auth-sub {
+  margin: 6px 0 22px;
+  text-align: center;
+  color: var(--tenue);
+  font-size: 0.9rem;
+}
+.auth-card .form .btn { margin-top: 4px; }
+.auth-toggle {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  background: transparent;
+  border: none;
+  color: var(--acento-fuerte);
+  font-size: 0.86rem;
+  padding: 6px;
+  transition: color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .auth-toggle:hover { color: var(--acento); }
+}
+
 /* ---------- Accesibilidad: menos movimiento ---------- */
 @media (prefers-reduced-motion: reduce) {
   *,
