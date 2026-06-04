@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  Clock, Calendar, Briefcase, ChevronRight, Plus, LogOut,
+  Clock, Calendar, Briefcase, ChevronRight, Plus,
   Search, RefreshCw, ChevronLeft,
 } from 'lucide-react'
 import { getResumen, eliminarJornada } from '../api.js'
@@ -8,6 +8,7 @@ import { cerrarSesion } from '../auth.js'
 import { money, horas, nombreMes, fechaCorta } from '../lib/format.js'
 import JornadaForm from './JornadaForm.jsx'
 import DetailModal from './DetailModal.jsx'
+import ProfileModal from './ProfileModal.jsx'
 
 const hoy = new Date()
 
@@ -21,6 +22,7 @@ export default function Panel({ usuario }) {
   const [busqueda, setBusqueda] = useState('')
   const [seleccion, setSeleccion] = useState(null)       // jornada para ver detalle
   const [editando, setEditando] = useState(null)          // jornada | 'nueva' | null
+  const [verPerfil, setVerPerfil] = useState(false)       // abre el modal de perfil
 
   const cargar = useCallback(async () => {
     setCargando(true)
@@ -82,8 +84,8 @@ export default function Panel({ usuario }) {
   const inicial = (usuario?.nombre || usuario?.email || '?').charAt(0).toUpperCase()
 
   return (
-    <div className="min-h-screen bg-[#eaedf1] flex flex-col items-center justify-center sm:py-6 px-0 sm:px-4 font-sans antialiased text-gray-900 select-none">
-      <div className="w-full max-w-md bg-[#f4f6fa] sm:rounded-[40px] shadow-2xl overflow-hidden border border-gray-200/40 p-0 flex flex-col min-h-screen sm:min-h-0 sm:h-[880px] relative">
+    <div className="min-h-screen bg-[#eaedf1] dark:bg-[#0d0f12] flex flex-col items-center justify-center sm:py-6 px-0 sm:px-4 font-sans antialiased text-gray-900 dark:text-gray-100 select-none">
+      <div className="w-full max-w-md bg-[#f4f6fa] dark:bg-[#15181d] sm:rounded-[40px] shadow-2xl overflow-hidden border border-gray-200/40 dark:border-white/10 p-0 flex flex-col min-h-screen sm:min-h-0 sm:h-[880px] relative">
 
         {/* Notch decorativo (solo desktop) */}
         <div className="absolute top-2 left-1/2 -translate-x-1/2 w-32 h-4 bg-black rounded-full z-40 hidden sm:block" />
@@ -95,51 +97,49 @@ export default function Panel({ usuario }) {
           <div className="flex justify-between items-center mb-5 mt-4 sm:mt-6">
             <button
               onClick={cargar}
-              className="p-2 bg-white/70 hover:bg-white rounded-full text-gray-400 hover:text-black shadow-sm transition active:scale-90"
+              className="p-2 bg-white/70 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 rounded-full text-gray-400 dark:text-gray-300 hover:text-black dark:hover:text-white shadow-sm transition active:scale-90"
               title="Recargar"
             >
               <RefreshCw className={`w-4 h-4 ${cargando ? 'animate-spin' : ''}`} />
             </button>
 
-            <div className="flex items-center gap-1.5 bg-white/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] border border-gray-200/50 pl-1.5 pr-3 py-1 rounded-full">
-              <span className="w-7 h-7 rounded-full bg-[#7c9deb] text-white text-xs font-bold grid place-items-center border border-white">
+            <button
+              onClick={() => setVerPerfil(true)}
+              title="Ver perfil"
+              className="flex items-center gap-1.5 bg-white/90 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 shadow-[0_2px_8px_rgba(0,0,0,0.03)] border border-gray-200/50 dark:border-white/10 pl-1.5 pr-3 py-1 rounded-full transition active:scale-95"
+            >
+              <span className="w-7 h-7 rounded-full bg-[#7c9deb] text-white text-xs font-bold grid place-items-center border border-white dark:border-white/20">
                 {inicial}
               </span>
-              <span className="text-xs font-semibold text-gray-800 max-w-[120px] truncate">
+              <span className="text-xs font-semibold text-gray-800 dark:text-gray-100 max-w-[120px] truncate">
                 {usuario?.nombre || usuario?.email || 'Cuenta'}
               </span>
-              <button
-                onClick={cerrarSesion}
-                className="ml-1.5 p-1 text-gray-400 hover:text-red-500 rounded-full hover:bg-red-50 transition"
-                title="Cerrar sesión"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-              </button>
-            </div>
+              <ChevronRight className="w-3.5 h-3.5 text-gray-300 dark:text-gray-500" />
+            </button>
           </div>
 
           {/* Título */}
           <div className="mb-3">
-            <h2 className="text-[38px] font-extrabold tracking-tight text-gray-950 p-0 m-0 leading-tight">
+            <h2 className="text-[38px] font-extrabold tracking-tight text-gray-950 dark:text-white p-0 m-0 leading-tight">
               Comisiones
             </h2>
           </div>
 
           {/* Navegación de mes */}
-          <div className="flex items-center justify-between mb-4 bg-white/80 border border-white/60 rounded-full p-1 shadow-sm">
+          <div className="flex items-center justify-between mb-4 bg-white/80 dark:bg-white/5 border border-white/60 dark:border-white/10 rounded-full p-1 shadow-sm">
             <button
               onClick={() => cambiarMes(-1)}
-              className="p-2 rounded-full text-gray-500 hover:text-black hover:bg-gray-100 transition active:scale-90"
+              className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition active:scale-90"
               aria-label="Mes anterior"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-sm font-semibold text-gray-700 capitalize">
-              {nombreMes(mes)} <span className="text-gray-400 font-medium">{anio}</span>
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 capitalize">
+              {nombreMes(mes)} <span className="text-gray-400 dark:text-gray-500 font-medium">{anio}</span>
             </span>
             <button
               onClick={() => cambiarMes(1)}
-              className="p-2 rounded-full text-gray-500 hover:text-black hover:bg-gray-100 transition active:scale-90"
+              className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition active:scale-90"
               aria-label="Mes siguiente"
             >
               <ChevronRight className="w-4 h-4" />
@@ -148,8 +148,8 @@ export default function Panel({ usuario }) {
 
           {/* Balance del mes */}
           <div className="mb-6 flex items-baseline">
-            <span className="text-[28px] font-thin text-gray-400 mr-1 leading-none">$</span>
-            <span className="text-[52px] font-extrabold tracking-tight text-black leading-none tabular-nums">
+            <span className="text-[28px] font-thin text-gray-400 dark:text-gray-500 mr-1 leading-none">$</span>
+            <span className="text-[52px] font-extrabold tracking-tight text-black dark:text-white leading-none tabular-nums">
               {(resumen?.totalGeneral ?? 0).toLocaleString('es-CL')}
             </span>
           </div>
@@ -168,13 +168,13 @@ export default function Panel({ usuario }) {
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               placeholder="Buscar por día o nota…"
-              className="w-full pl-9 pr-8 py-2.5 rounded-full bg-white text-xs border border-gray-100 shadow-sm focus:border-gray-300 focus:ring-0 outline-none transition"
+              className="w-full pl-9 pr-8 py-2.5 rounded-full bg-white dark:bg-white/5 dark:text-gray-100 dark:placeholder-gray-500 text-xs border border-gray-100 dark:border-white/10 shadow-sm focus:border-gray-300 dark:focus:border-white/20 focus:ring-0 outline-none transition"
             />
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+            <Search className="w-4 h-4 text-gray-400 dark:text-gray-500 absolute left-3.5 top-3" />
             {busqueda && (
               <button
                 onClick={() => setBusqueda('')}
-                className="absolute right-3 top-2 px-1 py-0.5 bg-gray-100 uppercase rounded text-[9px] font-bold text-gray-400 hover:text-black"
+                className="absolute right-3 top-2 px-1 py-0.5 bg-gray-100 dark:bg-white/10 uppercase rounded text-[9px] font-bold text-gray-400 dark:text-gray-300 hover:text-black dark:hover:text-white"
               >
                 Limpiar
               </button>
@@ -183,7 +183,7 @@ export default function Panel({ usuario }) {
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-100 rounded-2xl p-3 mb-4 text-xs text-red-700 flex items-center justify-between gap-2">
+            <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-2xl p-3 mb-4 text-xs text-red-700 dark:text-red-400 flex items-center justify-between gap-2">
               <span>{error}</span>
               <button onClick={cargar} className="font-semibold underline shrink-0">Reintentar</button>
             </div>
@@ -192,46 +192,46 @@ export default function Panel({ usuario }) {
           {/* Lista de días */}
           <div className="space-y-3.5 pb-20">
             {cargando && !resumen ? (
-              <div className="text-center py-10 text-sm text-gray-400">Cargando…</div>
+              <div className="text-center py-10 text-sm text-gray-400 dark:text-gray-500">Cargando…</div>
             ) : filtradas.length > 0 ? (
               filtradas.map((j, i) => (
                 <button
                   key={j.id}
                   onClick={() => setSeleccion(j)}
                   style={{ animationDelay: `${i * 40}ms` }}
-                  className="animate-appear w-full text-left bg-white rounded-3xl p-5 border border-white/60 shadow-[0_4px_16px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:scale-[1.005] active:scale-[0.995] transition-all flex items-center justify-between group cursor-pointer"
+                  className="animate-appear w-full text-left bg-white dark:bg-[#1b1f26] rounded-3xl p-5 border border-white/60 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:scale-[1.005] active:scale-[0.995] transition-all flex items-center justify-between group cursor-pointer"
                 >
                   <div className="space-y-1 min-w-0">
-                    <h4 className="text-base font-extrabold text-[#111] tracking-tight m-0 p-0">
+                    <h4 className="text-base font-extrabold text-[#111] dark:text-gray-100 tracking-tight m-0 p-0">
                       {fechaCorta(j.fecha)}
                     </h4>
                     {j.asistio ? (
-                      <p className="text-xs font-normal text-gray-400 m-0 p-0">
+                      <p className="text-xs font-normal text-gray-400 dark:text-gray-500 m-0 p-0">
                         {j.entrada ?? '—'} - {j.salida ?? '—'} · {horas(j.horas)}
                       </p>
                     ) : (
-                      <p className="text-xs font-medium text-amber-500 m-0 p-0 italic">
+                      <p className="text-xs font-medium text-amber-500 dark:text-amber-400 m-0 p-0 italic">
                         {j.nota || 'No asistió'}
                       </p>
                     )}
                     {j.asistio && j.nota && (
-                      <p className="text-[10px] text-gray-400/90 font-normal truncate max-w-[180px] pt-0.5">
+                      <p className="text-[10px] text-gray-400/90 dark:text-gray-500 font-normal truncate max-w-[180px] pt-0.5">
                         {j.nota}
                       </p>
                     )}
                   </div>
 
                   <div className="flex items-center gap-1 shrink-0">
-                    <span className={`text-[17px] font-extrabold tracking-tight ${j.asistio ? 'text-[#22c55e]' : 'text-gray-300'}`}>
+                    <span className={`text-[17px] font-extrabold tracking-tight ${j.asistio ? 'text-[#22c55e] dark:text-green-400' : 'text-gray-300 dark:text-gray-600'}`}>
                       {money(j.total)}
                     </span>
-                    <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-gray-500 transition-colors" />
+                    <ChevronRight className="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
                   </div>
                 </button>
               ))
             ) : (
-              <div className="text-center py-10 bg-white/50 border border-dashed border-gray-200 rounded-3xl p-6">
-                <p className="text-sm text-gray-400 font-medium">
+              <div className="text-center py-10 bg-white/50 dark:bg-white/5 border border-dashed border-gray-200 dark:border-white/10 rounded-3xl p-6">
+                <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">
                   {busqueda
                     ? 'No se encontraron días para la búsqueda.'
                     : 'No hay días cargados este mes.'}
@@ -239,12 +239,12 @@ export default function Panel({ usuario }) {
                 {busqueda ? (
                   <button
                     onClick={() => setBusqueda('')}
-                    className="mt-3 text-xs text-blue-600 hover:underline font-semibold"
+                    className="mt-3 text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold"
                   >
                     Limpiar búsqueda
                   </button>
                 ) : (
-                  <p className="mt-1 text-xs text-gray-400">Tocá «Nuevo día» para empezar.</p>
+                  <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Tocá «Nuevo día» para empezar.</p>
                 )}
               </div>
             )}
@@ -253,7 +253,7 @@ export default function Panel({ usuario }) {
         </div>
 
         {/* Botón flotante */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#f4f6fa] via-[#f4f6fa]/95 to-transparent pt-12 pb-8 px-6 text-center pointer-events-none z-30">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#f4f6fa] via-[#f4f6fa]/95 dark:from-[#15181d] dark:via-[#15181d]/95 to-transparent pt-12 pb-8 px-6 text-center pointer-events-none z-30">
           <button
             onClick={() => setEditando('nueva')}
             className="pointer-events-auto inline-flex items-center gap-1.5 bg-[#7c9deb] hover:bg-[#688edc] active:scale-95 transition-all py-3 px-6 rounded-full text-white font-semibold text-sm shadow-[0_6px_22px_rgba(124,157,235,0.4)] cursor-pointer tracking-tight"
@@ -266,6 +266,17 @@ export default function Panel({ usuario }) {
       </div>
 
       {/* Modales */}
+      {verPerfil && (
+        <ProfileModal
+          usuario={usuario}
+          resumen={resumen}
+          anio={anio}
+          mes={mes}
+          onClose={() => setVerPerfil(false)}
+          onLogout={cerrarSesion}
+        />
+      )}
+
       <DetailModal
         jornada={seleccion}
         onClose={() => setSeleccion(null)}
@@ -288,12 +299,12 @@ export default function Panel({ usuario }) {
 
 function Kpi({ icon: Icon, label, value, small }) {
   return (
-    <div className="bg-white/80 backdrop-blur border border-white/60 rounded-[20px] p-3 shadow-sm hover:shadow-md transition">
+    <div className="bg-white/80 dark:bg-white/5 backdrop-blur border border-white/60 dark:border-white/10 rounded-[20px] p-3 shadow-sm hover:shadow-md transition">
       <div className="flex items-center gap-1 mb-2">
-        <Icon className="w-3 h-3 text-gray-400 stroke-[1.5]" />
-        <span className="text-gray-400/80 text-[10px] font-medium tracking-tight">{label}</span>
+        <Icon className="w-3 h-3 text-gray-400 dark:text-gray-500 stroke-[1.5]" />
+        <span className="text-gray-400/80 dark:text-gray-500 text-[10px] font-medium tracking-tight">{label}</span>
       </div>
-      <div className={`${small ? 'text-base' : 'text-xl'} font-bold text-black tracking-tight leading-none pt-0.5 tabular-nums`}>
+      <div className={`${small ? 'text-base' : 'text-xl'} font-bold text-black dark:text-gray-100 tracking-tight leading-none pt-0.5 tabular-nums`}>
         {value}
       </div>
     </div>

@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* Modo oscuro por clase: las utilidades dark:* responden a .dark en <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
@@ -12,6 +15,9 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
 }
+/* Fondo del documento para que no aparezca blanco detrás de la tarjeta. */
+html { background: #eaedf1; transition: background-color 250ms ease; }
+html.dark { background: #0d0f12; }
 
 /* ---------- Animaciones (bottom-sheet, fade, scale) ---------- */
 @keyframes fadeIn {

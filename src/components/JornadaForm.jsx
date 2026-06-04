@@ -88,29 +88,29 @@ export default function JornadaForm({ jornada, anio, mes, onClose, onSaved }) {
   }
 
   const inputClase =
-    'w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 text-gray-800 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-sm'
+    'w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-gray-800 dark:text-gray-100 dark:placeholder-gray-500 focus:bg-white dark:focus:bg-white/10 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-sm [color-scheme:light] dark:[color-scheme:dark]'
   const labelClase =
-    'text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2'
+    'text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-2'
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn" onMouseDown={onClose}>
       <div
-        className="w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-3xl shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden animate-slideUp"
+        className="w-full max-w-lg bg-white dark:bg-[#15181d] rounded-t-[32px] sm:rounded-3xl shadow-2xl border border-gray-100 dark:border-white/10 flex flex-col max-h-[92vh] overflow-hidden animate-slideUp"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Cabecera */}
-        <div className="px-6 py-5 flex items-center justify-between border-b border-gray-50 bg-[#fafafa]">
+        <div className="px-6 py-5 flex items-center justify-between border-b border-gray-50 dark:border-white/5 bg-[#fafafa] dark:bg-[#1b1f26]">
           <div>
-            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              {jornada ? <Pencil className="w-5 h-5 text-[#2563eb]" /> : <Plus className="w-5 h-5 text-[#2563eb]" />}
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              {jornada ? <Pencil className="w-5 h-5 text-[#2563eb] dark:text-[#7c9deb]" /> : <Plus className="w-5 h-5 text-[#2563eb] dark:text-[#7c9deb]" />}
               {jornada ? 'Editar día' : 'Nuevo día'}
             </h3>
-            <p className="text-xs text-gray-400 font-normal">Cargá entrada, salida y ventas</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 font-normal">Cargá entrada, salida y ventas</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-700 transition"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -127,21 +127,21 @@ export default function JornadaForm({ jornada, anio, mes, onClose, onSaved }) {
             </label>
             <input type="date" required value={form.fecha} onChange={set('fecha')} className={inputClase} />
             {form.fecha && (
-              <p className="text-xs text-blue-600 font-medium pl-1">
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium pl-1">
                 Se guardará como: <strong className="font-semibold">{fechaCorta(form.fecha)}</strong>
               </p>
             )}
           </div>
 
           {/* Asistí */}
-          <label className="flex items-center gap-3 cursor-pointer select-none bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">
+          <label className="flex items-center gap-3 cursor-pointer select-none bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl px-4 py-3">
             <input
               type="checkbox"
               checked={form.asistio}
               onChange={set('asistio')}
               className="w-5 h-5 accent-[#2563eb]"
             />
-            <span className="text-sm font-medium text-gray-700">Asistí este día</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Asistí este día</span>
           </label>
 
           {form.asistio && (
@@ -159,9 +159,9 @@ export default function JornadaForm({ jornada, anio, mes, onClose, onSaved }) {
               </div>
 
               {/* Duración */}
-              <div className="bg-blue-50/50 rounded-xl p-3 flex justify-between items-center text-xs border border-blue-50">
-                <span className="font-medium text-blue-700">Duración calculada (con colación):</span>
-                <span className="font-bold bg-blue-100 text-blue-800 px-2.5 py-1 rounded-lg">
+              <div className="bg-blue-50/50 dark:bg-blue-500/10 rounded-xl p-3 flex justify-between items-center text-xs border border-blue-50 dark:border-blue-500/20">
+                <span className="font-medium text-blue-700 dark:text-blue-300">Duración calculada (con colación):</span>
+                <span className="font-bold bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-300 px-2.5 py-1 rounded-lg">
                   {estim.horas} h
                 </span>
               </div>
@@ -194,7 +194,7 @@ export default function JornadaForm({ jornada, anio, mes, onClose, onSaved }) {
           <div className="space-y-1">
             <label className={labelClase}>
               <FileText className="w-4 h-4 text-gray-400" />
-              Nota {form.asistio && <span className="text-gray-300 normal-case font-normal">(opcional)</span>}
+              Nota {form.asistio && <span className="text-gray-300 dark:text-gray-600 normal-case font-normal">(opcional)</span>}
             </label>
             <textarea
               value={form.nota}
@@ -206,11 +206,11 @@ export default function JornadaForm({ jornada, anio, mes, onClose, onSaved }) {
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
+          {error && <p className="text-red-500 dark:text-red-400 text-sm font-medium">{error}</p>}
 
           {/* Estimado */}
           {form.asistio && (
-            <div className="mt-2 bg-slate-900 text-white rounded-2xl p-4 flex justify-between items-center shadow-lg">
+            <div className="mt-2 bg-slate-900 dark:bg-black/40 dark:border dark:border-white/10 text-white rounded-2xl p-4 flex justify-between items-center shadow-lg">
               <div>
                 <p className="text-[10px] uppercase tracking-wider font-semibold text-gray-400">Total estimado del día</p>
                 <p className="text-xs font-normal text-gray-400">El servidor calcula el valor final</p>
@@ -226,7 +226,7 @@ export default function JornadaForm({ jornada, anio, mes, onClose, onSaved }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-4 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold text-sm transition active:scale-95"
+              className="px-5 py-4 rounded-xl border border-gray-200 dark:border-white/15 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/10 font-semibold text-sm transition active:scale-95"
             >
               Cancelar
             </button>

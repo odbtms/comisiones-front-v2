@@ -39,15 +39,15 @@ export default function Login() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#f3f4f6] px-4 py-8 select-none font-sans text-gray-900 antialiased">
-      <div className="w-full max-w-md bg-[#f8f9fa] rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-8 flex flex-col justify-between min-h-[640px] relative animate-appear">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#f3f4f6] dark:bg-[#0d0f12] px-4 py-8 select-none font-sans text-gray-900 dark:text-gray-100 antialiased">
+      <div className="w-full max-w-md bg-[#f8f9fa] dark:bg-[#15181d] rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-white/10 p-8 flex flex-col justify-between min-h-[640px] relative animate-appear">
 
         {/* Header */}
         <div className="text-center pt-8">
-          <h1 className="text-[40px] font-bold tracking-tight text-black mb-1 p-0 leading-none">
+          <h1 className="text-[40px] font-bold tracking-tight text-black dark:text-white mb-1 p-0 leading-none">
             {esRegistro ? 'Crear cuenta' : 'Hola de nuevo'}
           </h1>
-          <p className="text-sm font-normal text-gray-400">
+          <p className="text-sm font-normal text-gray-400 dark:text-gray-500">
             {esRegistro
               ? 'Registrate para empezar a fichar'
               : 'Ingresa tus credenciales para continuar'}
@@ -59,7 +59,7 @@ export default function Login() {
           {esRegistro && (
             <div className="relative group">
               <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
-                <User className="w-5 h-5 group-focus-within:text-black transition-colors" />
+                <User className="w-5 h-5 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" />
               </div>
               <input
                 type="text"
@@ -68,7 +68,7 @@ export default function Login() {
                 placeholder="Nombre (opcional)"
                 autoComplete="name"
                 maxLength={80}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white text-black placeholder-gray-400 border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-md focus:border-gray-200 focus:ring-1 focus:ring-gray-200 outline-none transition-all text-center text-base"
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white dark:bg-white/5 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-100 dark:border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-md focus:border-gray-200 dark:focus:border-white/25 focus:ring-1 focus:ring-gray-200 dark:focus:ring-white/15 outline-none transition-all text-center text-base"
               />
             </div>
           )}
@@ -76,7 +76,7 @@ export default function Login() {
           {/* Email */}
           <div className="relative group">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
-              <Mail className="w-5 h-5 group-focus-within:text-black transition-colors" />
+              <Mail className="w-5 h-5 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" />
             </div>
             <input
               type="email"
@@ -86,14 +86,14 @@ export default function Login() {
               required
               autoComplete="email"
               inputMode="email"
-              className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white text-black placeholder-gray-400 border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-md focus:border-gray-200 focus:ring-1 focus:ring-gray-200 outline-none transition-all text-center text-base"
+              className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white dark:bg-white/5 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-100 dark:border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-md focus:border-gray-200 dark:focus:border-white/25 focus:ring-1 focus:ring-gray-200 dark:focus:ring-white/15 outline-none transition-all text-center text-base"
             />
           </div>
 
           {/* Password */}
           <div className="relative group">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
-              <Lock className="w-5 h-5 group-focus-within:text-black transition-colors" />
+              <Lock className="w-5 h-5 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" />
             </div>
             <input
               type={showPassword ? 'text' : 'password'}
@@ -103,13 +103,13 @@ export default function Login() {
               required
               minLength={esRegistro ? 6 : undefined}
               autoComplete={esRegistro ? 'new-password' : 'current-password'}
-              className="w-full pl-12 pr-12 py-4 rounded-2xl bg-white text-black placeholder-gray-400 border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-md focus:border-gray-200 focus:ring-1 focus:ring-gray-200 outline-none transition-all text-center text-base"
+              className="w-full pl-12 pr-12 py-4 rounded-2xl bg-white dark:bg-white/5 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-100 dark:border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-md focus:border-gray-200 dark:focus:border-white/25 focus:ring-1 focus:ring-gray-200 dark:focus:ring-white/15 outline-none transition-all text-center text-base"
             />
             {password && (
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-black"
+                className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-black dark:hover:text-white"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -126,7 +126,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={cargando}
-              className="w-full py-4 px-6 rounded-full bg-black text-white font-semibold text-base shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:bg-gray-900 active:scale-[0.98] transition-all duration-200 disabled:opacity-60 disabled:active:scale-100"
+              className="w-full py-4 px-6 rounded-full bg-black dark:bg-white text-white dark:text-black font-semibold text-base shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:bg-gray-900 dark:hover:bg-gray-200 active:scale-[0.98] transition-all duration-200 disabled:opacity-60 disabled:active:scale-100"
             >
               {cargando ? 'Un momento…' : esRegistro ? 'Crear cuenta' : 'Ingresar'}
             </button>
@@ -138,7 +138,7 @@ export default function Login() {
           <button
             type="button"
             onClick={cambiarModo}
-            className="text-xs text-gray-500 hover:text-black font-medium transition-colors hover:underline"
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white font-medium transition-colors hover:underline"
           >
             {esRegistro
               ? '¿Ya tenés cuenta? Iniciá sesión'
