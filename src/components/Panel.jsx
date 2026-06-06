@@ -9,6 +9,10 @@ import { money, horas, nombreMes, fechaCorta } from '../lib/format.js'
 import JornadaForm from './JornadaForm.jsx'
 import DetailModal from './DetailModal.jsx'
 import ProfileModal from './ProfileModal.jsx'
+import AdminModal from './AdminModal.jsx'
+
+// El usuario admin (el primero) tiene acceso al panel de administración.
+const ADMIN_ID = 1
 
 const hoy = new Date()
 
@@ -23,6 +27,9 @@ export default function Panel({ usuario }) {
   const [seleccion, setSeleccion] = useState(null)       // jornada para ver detalle
   const [editando, setEditando] = useState(null)          // jornada | 'nueva' | null
   const [verPerfil, setVerPerfil] = useState(false)       // abre el modal de perfil
+  const [verAdmin, setVerAdmin] = useState(false)         // abre el panel de administración
+
+  const esAdmin = usuario?.id === ADMIN_ID
 
   const cargar = useCallback(async () => {
     setCargando(true)
@@ -272,10 +279,14 @@ export default function Panel({ usuario }) {
           resumen={resumen}
           anio={anio}
           mes={mes}
+          esAdmin={esAdmin}
+          onOpenAdmin={() => { setVerPerfil(false); setVerAdmin(true) }}
           onClose={() => setVerPerfil(false)}
           onLogout={cerrarSesion}
         />
       )}
+
+      {verAdmin && <AdminModal onClose={() => setVerAdmin(false)} />}
 
       <DetailModal
         jornada={seleccion}

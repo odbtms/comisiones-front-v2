@@ -19,9 +19,18 @@ export function getUsuario() {
 }
 
 /** Guarda la sesión tras login/registro. Recibe la respuesta del backend. */
-export function setSesion({ token, email, nombre }) {
+export function setSesion({ token, id, email, nombre }) {
   localStorage.setItem(TOKEN_KEY, token)
-  localStorage.setItem(USER_KEY, JSON.stringify({ email, nombre }))
+  localStorage.setItem(USER_KEY, JSON.stringify({ id, email, nombre }))
+  window.dispatchEvent(new Event('auth-changed'))
+}
+
+/**
+ * Actualiza los datos del usuario sin tocar el token (ej. tras pedir /me para
+ * traer el id en sesiones viejas que no lo tenían). No cierra sesión.
+ */
+export function actualizarUsuario({ id, email, nombre }) {
+  localStorage.setItem(USER_KEY, JSON.stringify({ id, email, nombre }))
   window.dispatchEvent(new Event('auth-changed'))
 }
 

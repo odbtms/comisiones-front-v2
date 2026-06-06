@@ -1,3 +1,4 @@
+
 # Proyecto Comisiones — Guía y estado
 
 > Lee esto primero al retomar. Resume QUÉ es el proyecto, QUÉ está hecho y QUÉ falta.

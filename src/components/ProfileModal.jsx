@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, Mail, Calendar, Clock, Briefcase, TrendingUp, LogOut, Moon, Sun } from 'lucide-react'
+import { X, Mail, Calendar, Clock, Briefcase, TrendingUp, LogOut, Moon, Sun, ShieldCheck, ChevronRight } from 'lucide-react'
 import { money, horas, nombreMes } from '../lib/format.js'
 import { getTema, alternarTema } from '../theme.js'
 
@@ -8,7 +8,7 @@ import { getTema, alternarTema } from '../theme.js'
  * Mantiene el mismo lenguaje visual que DetailModal (hoja redondeada que sube).
  * Se cierra tocando el fondo o con Esc.
  */
-export default function ProfileModal({ usuario, resumen, anio, mes, onClose, onLogout }) {
+export default function ProfileModal({ usuario, resumen, anio, mes, esAdmin, onOpenAdmin, onClose, onLogout }) {
   const [tema, setTemaLocal] = useState(() => getTema())
 
   useEffect(() => {
@@ -110,6 +110,24 @@ export default function ProfileModal({ usuario, resumen, anio, mes, onClose, onL
               </Fila>
             )}
           </div>
+
+          {/* Administración (solo el usuario admin) */}
+          {esAdmin && (
+            <div className="pt-4 border-t border-gray-50 dark:border-white/5">
+              <button
+                onClick={onOpenAdmin}
+                className="w-full flex items-center justify-between gap-3 bg-violet-50 dark:bg-violet-500/10 hover:bg-violet-100 dark:hover:bg-violet-500/20 border border-violet-100 dark:border-violet-500/20 rounded-2xl px-4 py-3 transition active:scale-[0.99]"
+              >
+                <span className="flex items-center gap-2.5 text-sm font-semibold text-violet-800 dark:text-violet-200">
+                  <span className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-sm">
+                    <ShieldCheck className="w-4 h-4" />
+                  </span>
+                  Administración
+                </span>
+                <ChevronRight className="w-4 h-4 text-violet-400 dark:text-violet-300/70 shrink-0" />
+              </button>
+            </div>
+          )}
 
           {/* Modo oscuro */}
           <div className="pt-4 border-t border-gray-50 dark:border-white/5">

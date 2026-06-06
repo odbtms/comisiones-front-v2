@@ -59,6 +59,18 @@ export function register(email, password, nombre) {
   })
 }
 
+/** Datos del usuario del token: { id, email, nombre }. Valida la sesión. */
+export function getMe() {
+  return request(`${API}/auth/me`)
+}
+
+// ---------- Administración (solo el usuario admin) ----------
+
+/** Lista de usuarios con estadísticas. 403 si el que pregunta no es admin. */
+export function getAdminUsuarios() {
+  return request(`${API}/admin/usuarios`)
+}
+
 // ---------- Jornadas ----------
 
 /** Resumen de un mes: jornadas + totales. */
