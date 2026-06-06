@@ -71,6 +71,11 @@ export function getAdminUsuarios() {
   return request(`${API}/admin/usuarios`)
 }
 
+/** Elimina un usuario y sus jornadas (solo admin). 204 si sale bien. */
+export function eliminarAdminUsuario(id) {
+  return request(`${API}/admin/usuarios/${id}`, { method: 'DELETE' })
+}
+
 // ---------- Jornadas ----------
 
 /** Resumen de un mes: jornadas + totales. */

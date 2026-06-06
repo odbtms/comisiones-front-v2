@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { X, ShieldCheck, Mail, Briefcase, TrendingUp, Calendar, RefreshCw } from 'lucide-react'
-import { getAdminUsuarios } from '../api.js'
+import { X, ShieldCheck, Mail, Briefcase, TrendingUp, Calendar, RefreshCw, Trash2 } from 'lucide-react'
+import { getAdminUsuarios, eliminarAdminUsuario } from '../api.js'
 import { money, fechaCorta } from '../lib/format.js'
 
 /**
@@ -13,6 +13,7 @@ export default function AdminModal({ onClose }) {
   const [usuarios, setUsuarios] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
+  const [borrandoId, setBorrandoId] = useState(null)
 
   async function cargar() {
     setCargando(true)
@@ -24,6 +25,23 @@ export default function AdminModal({ onClose }) {
       setUsuarios(null)
     } finally {
       setCargando(false)
+    }
+  }
+
+  async function eliminar(u) {
+    const quien = u.nombre || u.email
+    if (!window.confirm(
+      `¿Eliminar a "${quien}"?\n\nSe borrarán su cuenta y sus ${u.jornadas} jornada(s). Esta acción no se puede deshacer.`
+    )) return
+    setBorrandoId(u.id)
+    setError(null)
+    try {
+      await eliminarAdminUsuario(u.id)
+      setUsuarios((prev) => prev.filter((x) => x.id !== u.id))
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setBorrandoId(null)
     }
   }
 
@@ -81,7 +99,13 @@ export default function AdminModal({ onClose }) {
           )}
 
           {!cargando && !error && usuarios?.map((u, i) => (
-            <UsuarioCard key={u.id} u={u} delay={i * 40} />
+            <UsuarioCard
+              key={u.id}
+              u={u}
+              delay={i * 40}
+              borrando={borrandoId === u.id}
+              onEliminar={() => eliminar(u)}
+            />
           ))}
 
           {!cargando && !error && total === 0 && (
@@ -94,14 +118,14 @@ export default function AdminModal({ onClose }) {
   )
 }
 
-function UsuarioCard({ u, delay }) {
+function UsuarioCard({ u, delay, borrando, onEliminar }) {
   const nombre = u.nombre || u.email || 'Cuenta'
   const inicial = nombre.charAt(0).toUpperCase()
 
   return (
     <div
       style={{ animationDelay: `${delay}ms` }}
-      className="animate-appear bg-white dark:bg-[#1b1f26] rounded-3xl p-5 border border-gray-100 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+      className={`animate-appear bg-white dark:bg-[#1b1f26] rounded-3xl p-5 border border-gray-100 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition ${borrando ? 'opacity-50 pointer-events-none' : ''}`}
     >
       {/* Identidad */}
       <div className="flex items-center gap-3 min-w-0">
@@ -122,6 +146,20 @@ function UsuarioCard({ u, delay }) {
             <span className="truncate">{u.email}</span>
           </p>
         </div>
+
+        {/* Eliminar (no para el admin / cuenta propia) */}
+        {!u.esAdmin && (
+          <button
+            onClick={onEliminar}
+            disabled={borrando}
+            title={`Eliminar a ${nombre}`}
+            className="p-2 rounded-full text-gray-300 dark:text-gray-600 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition active:scale-90 shrink-0"
+          >
+            {borrando
+              ? <RefreshCw className="w-4 h-4 animate-spin" />
+              : <Trash2 className="w-4 h-4" />}
+          </button>
+        )}
       </div>
 
       {/* Estadísticas */}
