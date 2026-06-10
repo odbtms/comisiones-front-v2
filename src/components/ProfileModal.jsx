@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, Mail, Calendar, Clock, Briefcase, TrendingUp, LogOut, Moon, Sun, ShieldCheck, ChevronRight } from 'lucide-react'
+import { X, Mail, Calendar, Clock, Briefcase, TrendingUp, ShoppingBag, LogOut, Moon, Sun, ShieldCheck, ChevronRight } from 'lucide-react'
 import { money, horas, nombreMes } from '../lib/format.js'
 import { getTema, alternarTema } from '../theme.js'
 
@@ -24,6 +24,13 @@ export default function ProfileModal({ usuario, resumen, anio, mes, esAdmin, onO
   const oscuro = tema === 'dark'
   const nombre = usuario?.nombre || usuario?.email || 'Cuenta'
   const inicial = nombre.charAt(0).toUpperCase()
+
+  // Total facturado del mes (ventas brutas). Lo manda el backend en el resumen;
+  // si por algún motivo no viniera, lo calculamos sumando las jornadas.
+  const totalVentas =
+    resumen?.totalVentasBrutas != null
+      ? Number(resumen.totalVentasBrutas)
+      : (resumen?.jornadas ?? []).reduce((acc, j) => acc + Number(j.ventasBrutas || 0), 0)
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn" onMouseDown={onClose}>
@@ -73,6 +80,11 @@ export default function ProfileModal({ usuario, resumen, anio, mes, esAdmin, onO
 
           {/* Resumen del mes */}
           <div className="space-y-4">
+            <Fila icon={ShoppingBag}>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold">Ventas del mes</p>
+              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 tabular-nums">{money(totalVentas)}</p>
+            </Fila>
+
             <Fila icon={Calendar}>
               <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold">Días trabajados</p>
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{resumen?.diasTrabajados ?? 0}</p>
