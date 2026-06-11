@@ -56,7 +56,8 @@ export default function Panel({ usuario }) {
   }
 
   async function confirmarEliminar(j) {
-    if (!window.confirm(`¿Eliminar el día ${j.fecha}?`)) return
+    const tramo = j.entrada && j.salida ? ` (${j.entrada}–${j.salida})` : ''
+    if (!window.confirm(`¿Eliminar el día ${fechaCorta(j.fecha)}${tramo}?`)) return
     try {
       await eliminarJornada(j.id)
       setSeleccion(null)
@@ -72,6 +73,14 @@ export default function Panel({ usuario }) {
   }
 
   const jornadas = resumen?.jornadas ?? []
+
+  // Cuántos tramos hay por fecha: si un día tiene más de uno es "turno partido"
+  // (ej: 10-14 y luego 15-17). Sirve para marcarlo en la lista.
+  const tramosPorFecha = useMemo(() => {
+    const conteo = {}
+    for (const j of jornadas) conteo[j.fecha] = (conteo[j.fecha] || 0) + 1
+    return conteo
+  }, [jornadas])
 
   const filtradas = useMemo(() => {
     const q = busqueda.trim().toLowerCase()
@@ -209,9 +218,16 @@ export default function Panel({ usuario }) {
                   className="animate-appear w-full text-left bg-white dark:bg-[#1b1f26] rounded-3xl p-5 border border-white/60 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:scale-[1.005] active:scale-[0.995] transition-all flex items-center justify-between group cursor-pointer"
                 >
                   <div className="space-y-1 min-w-0">
-                    <h4 className="text-base font-extrabold text-[#111] dark:text-gray-100 tracking-tight m-0 p-0">
-                      {fechaCorta(j.fecha)}
-                    </h4>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="text-base font-extrabold text-[#111] dark:text-gray-100 tracking-tight m-0 p-0">
+                        {fechaCorta(j.fecha)}
+                      </h4>
+                      {tramosPorFecha[j.fecha] > 1 && (
+                        <span className="text-[9px] font-bold uppercase tracking-wide text-[#7c9deb] bg-[#7c9deb]/10 dark:bg-[#7c9deb]/20 px-1.5 py-0.5 rounded-full">
+                          Turno partido
+                        </span>
+                      )}
+                    </div>
                     {j.asistio ? (
                       <p className="text-xs font-normal text-gray-400 dark:text-gray-500 m-0 p-0">
                         {j.entrada ?? '—'} - {j.salida ?? '—'} · {horas(j.horas)}
