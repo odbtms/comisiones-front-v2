@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { X, ShieldCheck, Mail, Briefcase, TrendingUp, Calendar, RefreshCw, Trash2 } from 'lucide-react'
+import { sileo } from 'sileo'
 import { getAdminUsuarios, eliminarAdminUsuario } from '../api.js'
 import { money, fechaCorta } from '../lib/format.js'
 
@@ -38,8 +39,10 @@ export default function AdminModal({ onClose }) {
     try {
       await eliminarAdminUsuario(u.id)
       setUsuarios((prev) => prev.filter((x) => x.id !== u.id))
+      sileo.success({ title: 'Usuario eliminado', description: quien })
     } catch (e) {
       setError(e.message)
+      sileo.error({ title: 'No se pudo eliminar', description: e.message })
     } finally {
       setBorrandoId(null)
     }

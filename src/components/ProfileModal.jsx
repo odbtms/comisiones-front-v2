@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { X, Mail, Calendar, Clock, Briefcase, TrendingUp, ShoppingBag, LogOut, Moon, Sun, ShieldCheck, ChevronRight } from 'lucide-react'
+import { sileo } from 'sileo'
 import { money, horas, nombreMes } from '../lib/format.js'
 import { getTema, alternarTema } from '../theme.js'
 
@@ -163,7 +164,7 @@ export default function ProfileModal({ usuario, resumen, anio, mes, esAdmin, onO
           {/* Cerrar sesión */}
           <div className="pt-1">
             <button
-              onClick={onLogout}
+              onClick={() => { sileo.info({ title: 'Sesión cerrada' }); onLogout() }}
               className="w-full py-3 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-2xl flex items-center justify-center gap-1.5 transition text-xs font-semibold active:scale-95"
             >
               <LogOut className="w-4 h-4" />

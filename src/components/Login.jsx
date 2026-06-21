@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { sileo } from 'sileo'
 import { login, register } from '../api.js'
 import { setSesion } from '../auth.js'
 
@@ -26,9 +27,15 @@ export default function Login() {
       const r = esRegistro
         ? await register(email.trim(), password, nombre.trim())
         : await login(email.trim(), password)
-      setSesion(r)
+      const quien = (r.nombre || '').trim()
+      sileo.success({
+        title: esRegistro ? '¡Cuenta creada!' : `¡Hola${quien ? `, ${quien}` : ' de nuevo'}!`,
+        description: esRegistro ? 'Ya podés empezar a fichar.' : 'Sesión iniciada.',
+      })
+      setSesion(r) // dispara 'auth-changed' y desmonta el login (el toast vive en App)
     } catch (err) {
       setError(err.message)
+      sileo.error({ title: 'No se pudo continuar', description: err.message })
       setCargando(false)
     }
   }

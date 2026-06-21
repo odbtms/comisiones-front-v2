@@ -3,6 +3,7 @@ import {
   Clock, Calendar, Briefcase, ChevronRight, Plus,
   Search, RefreshCw, ChevronLeft,
 } from 'lucide-react'
+import { sileo } from 'sileo'
 import { getResumen, eliminarJornada } from '../api.js'
 import { cerrarSesion } from '../auth.js'
 import { money, horas, nombreMes, fechaCorta } from '../lib/format.js'
@@ -58,12 +59,17 @@ export default function Panel({ usuario }) {
   async function confirmarEliminar(j) {
     const tramo = j.entrada && j.salida ? ` (${j.entrada}–${j.salida})` : ''
     if (!window.confirm(`¿Eliminar el día ${fechaCorta(j.fecha)}${tramo}?`)) return
+    setSeleccion(null)
     try {
-      await eliminarJornada(j.id)
-      setSeleccion(null)
+      // sileo.promise muestra loading y transiciona a éxito/error con la física del paquete.
+      await sileo.promise(eliminarJornada(j.id), {
+        loading: { title: 'Eliminando…' },
+        success: { title: 'Día eliminado', description: fechaCorta(j.fecha) },
+        error: (e) => ({ title: 'No se pudo eliminar', description: e?.message || 'Error' }),
+      })
       cargar()
-    } catch (e) {
-      setError(e.message)
+    } catch {
+      /* el toast de error ya lo muestra sileo.promise */
     }
   }
 

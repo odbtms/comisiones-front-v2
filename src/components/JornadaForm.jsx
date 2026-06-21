@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { X, Calendar, Clock, DollarSign, FileText, Plus, Pencil } from 'lucide-react'
+import { sileo } from 'sileo'
 import { crearJornada, actualizarJornada } from '../api.js'
 import { fechaCorta, estimarHoras, money } from '../lib/format.js'
 
@@ -80,9 +81,17 @@ export default function JornadaForm({ jornada, anio, mes, onClose, onSaved }) {
     try {
       if (jornada) await actualizarJornada(jornada.id, payload)
       else await crearJornada(payload)
-      onSaved()
+      sileo.success({
+        title: jornada ? 'Cambios guardados' : 'Día agregado con éxito',
+        description: fechaCorta(form.fecha),
+      })
+      onSaved() // cierra el form (el toast vive en App, no se desmonta)
     } catch (err) {
       setError(err.message)
+      sileo.error({
+        title: jornada ? 'No se pudo guardar' : 'No se pudo agregar el día',
+        description: err.message,
+      })
       setGuardando(false)
     }
   }
