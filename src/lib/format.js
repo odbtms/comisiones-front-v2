@@ -39,6 +39,43 @@ export function nombreMes(mes) {
   return meses[mes - 1] ?? ''
 }
 
+const mesesCortos = [
+  'ene', 'feb', 'mar', 'abr', 'may', 'jun',
+  'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
+]
+
+/**
+ * "2026-06-24" -> "2026-06-22" (el lunes de esa semana).
+ * Sirve para agrupar las jornadas por semana. Parseo manual para evitar
+ * corrimientos por zona horaria.
+ */
+export function lunesDeSemana(iso) {
+  const [y, m, d] = iso.split('-').map(Number)
+  const fecha = new Date(y, m - 1, d)
+  const dow = (fecha.getDay() + 6) % 7 // 0 = lunes, 6 = domingo
+  fecha.setDate(fecha.getDate() - dow)
+  const yy = fecha.getFullYear()
+  const mm = String(fecha.getMonth() + 1).padStart(2, '0')
+  const dd = String(fecha.getDate()).padStart(2, '0')
+  return `${yy}-${mm}-${dd}`
+}
+
+/**
+ * Etiqueta del rango de una semana a partir del lunes iso:
+ * "22 – 28 jun" (o "29 may – 4 jun" si cruza de mes).
+ */
+export function rangoSemana(lunesIso) {
+  const [y, m, d] = lunesIso.split('-').map(Number)
+  const ini = new Date(y, m - 1, d)
+  const fin = new Date(y, m - 1, d + 6)
+  const mi = mesesCortos[ini.getMonth()]
+  const mf = mesesCortos[fin.getMonth()]
+  if (ini.getMonth() === fin.getMonth()) {
+    return `${ini.getDate()} – ${fin.getDate()} ${mf}`
+  }
+  return `${ini.getDate()} ${mi} – ${fin.getDate()} ${mf}`
+}
+
 /** "2026-05-12" -> "Mayo 12" (mes capitalizado + día) */
 export function fechaCorta(iso) {
   if (!iso) return ''

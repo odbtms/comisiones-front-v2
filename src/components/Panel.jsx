@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Clock, Calendar, Briefcase, ChevronRight, Plus,
-  Search, RefreshCw, ChevronLeft,
+  Search, RefreshCw, ChevronLeft, ChevronDown,
 } from 'lucide-react'
 import { sileo } from 'sileo'
 import { getResumen, eliminarJornada } from '../api.js'
 import { cerrarSesion } from '../auth.js'
-import { money, horas, nombreMes, fechaCorta } from '../lib/format.js'
+import { money, horas, nombreMes, fechaCorta, lunesDeSemana, rangoSemana } from '../lib/format.js'
 import JornadaForm from './JornadaForm.jsx'
 import DetailModal from './DetailModal.jsx'
 import ProfileModal from './ProfileModal.jsx'
@@ -29,6 +29,7 @@ export default function Panel({ usuario }) {
   const [editando, setEditando] = useState(null)          // jornada | 'nueva' | null
   const [verPerfil, setVerPerfil] = useState(false)       // abre el modal de perfil
   const [verAdmin, setVerAdmin] = useState(false)         // abre el panel de administración
+  const [colapsadas, setColapsadas] = useState(() => new Set()) // semanas plegadas (por lunes iso)
 
   const esAdmin = usuario?.id === ADMIN_ID
 
@@ -102,6 +103,35 @@ export default function Panel({ usuario }) {
       )
     })
   }, [jornadas, busqueda])
+
+  // Agrupa los días por semana (lunes a domingo). Cada grupo trae el rango de
+  // fechas, cuántos días distintos tiene y el total de la semana. Las jornadas
+  // ya llegan ordenadas por fecha ascendente desde el backend.
+  const semanas = useMemo(() => {
+    const grupos = new Map()
+    for (const j of filtradas) {
+      const key = lunesDeSemana(j.fecha)
+      if (!grupos.has(key)) grupos.set(key, [])
+      grupos.get(key).push(j)
+    }
+    return [...grupos.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, items]) => ({
+        key,
+        rango: rangoSemana(key),
+        items,
+        diasSemana: new Set(items.map((j) => j.fecha)).size,
+        totalSemana: items.reduce((s, j) => s + (j.total || 0), 0),
+      }))
+  }, [filtradas])
+
+  function toggleSemana(key) {
+    setColapsadas((prev) => {
+      const next = new Set(prev)
+      next.has(key) ? next.delete(key) : next.add(key)
+      return next
+    })
+  }
 
   const inicial = (usuario?.nombre || usuario?.email || '?').charAt(0).toUpperCase()
 
@@ -211,53 +241,86 @@ export default function Panel({ usuario }) {
             </div>
           )}
 
-          {/* Lista de días */}
-          <div className="space-y-3.5 pb-20">
+          {/* Lista de días, agrupada por semana */}
+          <div className="space-y-5 pb-20">
             {cargando && !resumen ? (
               <div className="text-center py-10 text-sm text-gray-400 dark:text-gray-500">Cargando…</div>
-            ) : filtradas.length > 0 ? (
-              filtradas.map((j, i) => (
-                <button
-                  key={j.id}
-                  onClick={() => setSeleccion(j)}
-                  style={{ animationDelay: `${i * 40}ms` }}
-                  className="animate-appear w-full text-left bg-white dark:bg-[#1b1f26] rounded-3xl p-5 border border-white/60 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:scale-[1.005] active:scale-[0.995] transition-all flex items-center justify-between group cursor-pointer"
-                >
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="text-base font-extrabold text-[#111] dark:text-gray-100 tracking-tight m-0 p-0">
-                        {fechaCorta(j.fecha)}
-                      </h4>
-                      {tramosPorFecha[j.fecha] > 1 && (
-                        <span className="text-[9px] font-bold uppercase tracking-wide text-[#7c9deb] bg-[#7c9deb]/10 dark:bg-[#7c9deb]/20 px-1.5 py-0.5 rounded-full">
-                          Turno partido
+            ) : semanas.length > 0 ? (
+              semanas.map((s) => {
+                const colapsada = colapsadas.has(s.key)
+                return (
+                  <div key={s.key} className="space-y-3.5">
+                    {/* Encabezado de la semana (tocar para plegar/desplegar) */}
+                    <button
+                      onClick={() => toggleSemana(s.key)}
+                      className="w-full flex items-center justify-between px-1.5 py-1 group active:scale-[0.99] transition-transform"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <ChevronDown
+                          className={`w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform ${colapsada ? '-rotate-90' : ''}`}
+                        />
+                        <span className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                          {s.rango}
                         </span>
-                      )}
-                    </div>
-                    {j.asistio ? (
-                      <p className="text-xs font-normal text-gray-400 dark:text-gray-500 m-0 p-0">
-                        {j.entrada ?? '—'} - {j.salida ?? '—'} · {horas(j.horas)}
-                      </p>
-                    ) : (
-                      <p className="text-xs font-medium text-amber-500 dark:text-amber-400 m-0 p-0 italic">
-                        {j.nota || 'No asistió'}
-                      </p>
-                    )}
-                    {j.asistio && j.nota && (
-                      <p className="text-[10px] text-gray-400/90 dark:text-gray-500 font-normal truncate max-w-[180px] pt-0.5">
-                        {j.nota}
-                      </p>
-                    )}
-                  </div>
+                        <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">
+                          {s.diasSemana} {s.diasSemana === 1 ? 'día' : 'días'}
+                        </span>
+                      </div>
+                      <span className="text-xs font-bold text-gray-600 dark:text-gray-300 tabular-nums shrink-0">
+                        {money(s.totalSemana)}
+                      </span>
+                    </button>
 
-                  <div className="flex items-center gap-1 shrink-0">
-                    <span className={`text-[17px] font-extrabold tracking-tight ${j.asistio ? 'text-[#22c55e] dark:text-green-400' : 'text-gray-300 dark:text-gray-600'}`}>
-                      {money(j.total)}
-                    </span>
-                    <ChevronRight className="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+                    {/* Días de la semana */}
+                    {!colapsada && (
+                      <div className="space-y-3.5">
+                        {s.items.map((j, i) => (
+                          <button
+                            key={j.id}
+                            onClick={() => setSeleccion(j)}
+                            style={{ animationDelay: `${i * 40}ms` }}
+                            className="animate-appear w-full text-left bg-white dark:bg-[#1b1f26] rounded-3xl p-5 border border-white/60 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:scale-[1.005] active:scale-[0.995] transition-all flex items-center justify-between group cursor-pointer"
+                          >
+                            <div className="space-y-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="text-base font-extrabold text-[#111] dark:text-gray-100 tracking-tight m-0 p-0">
+                                  {fechaCorta(j.fecha)}
+                                </h4>
+                                {tramosPorFecha[j.fecha] > 1 && (
+                                  <span className="text-[9px] font-bold uppercase tracking-wide text-[#7c9deb] bg-[#7c9deb]/10 dark:bg-[#7c9deb]/20 px-1.5 py-0.5 rounded-full">
+                                    Turno partido
+                                  </span>
+                                )}
+                              </div>
+                              {j.asistio ? (
+                                <p className="text-xs font-normal text-gray-400 dark:text-gray-500 m-0 p-0">
+                                  {j.entrada ?? '—'} - {j.salida ?? '—'} · {horas(j.horas)}
+                                </p>
+                              ) : (
+                                <p className="text-xs font-medium text-amber-500 dark:text-amber-400 m-0 p-0 italic">
+                                  {j.nota || 'No asistió'}
+                                </p>
+                              )}
+                              {j.asistio && j.nota && (
+                                <p className="text-[10px] text-gray-400/90 dark:text-gray-500 font-normal truncate max-w-[180px] pt-0.5">
+                                  {j.nota}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-1 shrink-0">
+                              <span className={`text-[17px] font-extrabold tracking-tight ${j.asistio ? 'text-[#22c55e] dark:text-green-400' : 'text-gray-300 dark:text-gray-600'}`}>
+                                {money(j.total)}
+                              </span>
+                              <ChevronRight className="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </button>
-              ))
+                )
+              })
             ) : (
               <div className="text-center py-10 bg-white/50 dark:bg-white/5 border border-dashed border-gray-200 dark:border-white/10 rounded-3xl p-6">
                 <p className="text-sm text-gray-400 dark:text-gray-500 font-medium">
